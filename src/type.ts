@@ -1,10 +1,10 @@
 import { Query } from "mongoose";
 
 export type QueryBuilderInstance<T> = {
-  modelQuery: Query<T[], T>;
+  modelQuery: Query<Array<T>, T>;
   query: Record<string, string>;
   filter(): QueryBuilderInstance<T>;
-  search(fields: string[]): QueryBuilderInstance<T>;
+  search(fields: Array<string>): QueryBuilderInstance<T>;
   sort(): QueryBuilderInstance<T>;
   fields(): QueryBuilderInstance<T>;
   paginate(): QueryBuilderInstance<T>;
@@ -15,7 +15,7 @@ export type QueryBuilderInstance<T> = {
     totalPage: number;
   }>;
   resolver(): Promise<{
-    data: T[];
+    data: Array<T>;
     meta: {
       page: number;
       limit: number;

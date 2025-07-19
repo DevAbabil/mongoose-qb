@@ -1,17 +1,18 @@
 {
   "name": "mongoose-qb",
-  "version": "1.2.0",
-  "description": "Mongoose Query Builder",
+  "version": "1.0.3",
+  "description": "A lightweight and flexible query builder for Mongoose, enabling easy chaining of search, filter, sort, field selection, and pagination operations.",
   "scripts": {
     "build": "sh scripts/build.sh"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "types": "./dist/index.d.ts"
     }
   },
   "type": "module",
@@ -20,17 +21,20 @@
     "dist"
   ],
   "keywords": [
-    "http client",
-    "ajax",
-    "fetch",
-    "request",
-    "api",
-    "network",
-    "promise",
-    "cutefetch"
+    "mongoose",
+    "query-builder",
+    "mongodb",
+    "pagination",
+    "filtering",
+    "sorting",
+    "search",
+    "typescript",
+    "nodejs",
+    "database",
+    "mongo",
+    "express"
   ],
   "author": "Md Ababil Hossain (https://devababil.com)",
-  "createdAt": "2024-02-29T08:55:46.928Z",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -41,7 +45,7 @@
   },
   "homepage": "https://github.com/DevAbabil/mongoose-qb#readme",
   "devDependencies": {
-    "@types/node": "^22.14.1",
+    "@types/node": "^24.0.15",
     "@typescript-eslint/eslint-plugin": "^8.24.1",
     "@typescript-eslint/parser": "^8.24.1",
     "handlebars": "^4.7.8",

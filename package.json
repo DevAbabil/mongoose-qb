@@ -1,5 +1,5 @@
 {
-  "name": "mongoose-query-builder",
+  "name": "mongoose-qb",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DevAbabil/mongoose-query-builder.git"
+    "url": "git+https://github.com/DevAbabil/mongoose-qb.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/DevAbabil/mongoose-query-builder/issues"
+    "url": "https://github.com/DevAbabil/mongoose-qb/issues"
   },
-  "homepage": "https://github.com/DevAbabil/mongoose-query-builder#readme"
+  "homepage": "https://github.com/DevAbabil/mongoose-qb#readme"
 }

@@ -1,4 +1,5 @@
 import { Query } from "mongoose";
+import type { QueryBuilderInstance } from "./type"; // or wherever you put it
 
 interface IOptions {
   excludesFields: Array<string>;
@@ -77,7 +78,13 @@ export const GenQueryBuilder = (options: IOptions) => {
 export const createUseQuery = (
   QueryBuilder: ReturnType<typeof GenQueryBuilder>
 ) => {
-  return <T>(modelQuery: Query<Array<T>, T>, query: Record<string, string>) => {
-    return new QueryBuilder(modelQuery, query);
+  return function useQuery<T>(
+    modelQuery: Query<T[], T>,
+    query: Record<string, string>
+  ): QueryBuilderInstance<T> {
+    return new QueryBuilder(
+      modelQuery,
+      query
+    ) as unknown as QueryBuilderInstance<T>;
   };
 };

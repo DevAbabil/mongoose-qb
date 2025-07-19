@@ -1,21 +1,56 @@
 {
   "name": "mongoose-qb",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.2.0",
+  "description": "Mongoose Query Builder",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "sh scripts/build.sh"
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "http client",
+    "ajax",
+    "fetch",
+    "request",
+    "api",
+    "network",
+    "promise",
+    "cutefetch"
+  ],
+  "author": "Md Ababil Hossain (https://devababil.com)",
+  "createdAt": "2024-02-29T08:55:46.928Z",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DevAbabil/mongoose-qb.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/DevAbabil/mongoose-qb/issues"
   },
-  "homepage": "https://github.com/DevAbabil/mongoose-qb#readme"
+  "homepage": "https://github.com/DevAbabil/mongoose-qb#readme",
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "handlebars": "^4.7.8",
+    "rimraf": "^5.0.10",
+    "tsup": "^8.3.6",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "mongoose": "^8.16.4"
+  }
 }

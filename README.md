@@ -1,8 +1,8 @@
 # mongoose-qb
 
-A powerful and flexible query builder for Mongoose to simplify building complex queries with filtering, searching, sorting, field limiting, and pagination.
+A powerful and flexible query builder for **Mongoose** that simplifies building complex queries with filtering, searching, sorting, field limiting, and pagination.
 
-## Installation
+## 🚀 Installation
 
 ```bash
 npm install mongoose-qb
@@ -14,44 +14,60 @@ or
 yarn add mongoose-qb
 ```
 
-## Overview
+## 🌟 Overview
 
-`mongoose-qb` helps you create reusable query builder hooks/functions that wrap around Mongoose queries, making it easy to apply common query patterns such as:
+`mongoose-qb` helps you create **reusable query builder hooks/functions** that wrap around Mongoose queries, making it easy to apply common query patterns such as:
 
-- Searching (across multiple fields)
-- Filtering
-- Sorting
-- Selecting specific fields
-- Pagination
+- 🔍 Searching (across multiple fields)
+- 🎯 Filtering
+- 🔃 Sorting
+- 📦 Field selection
+- 📚 Pagination
 
-## Core Concepts
+## 📘 Core Concepts
 
-- **GenQueryBuilder(options)**: Generate a customized query builder instance with configuration.
-- **createUseQuery(QueryBuilder)**: Creates a reusable query function based on your QueryBuilder.
-- **Query chaining**: Chain methods like `.search()`, `.filter()`, `.sort()`, `.fields()`, and `.paginate()` on your query.
-- **resolver()**: Executes the built query and returns data along with metadata.
+- **`genQueryBuilder(options)`**: Generate a customized query builder instance.
+- **`createUseQuery(QueryBuilder)`**: Create a reusable query function based on your builder.
+- **Chainable API**: Use `.search()`, `.filter()`, `.sort()`, `.fields()`, `.paginate()`.
+- **`.resolver()`**: Executes the query and returns data with metadata.
 
-## Usage
+## ⚙️ Usage
 
-### Step 1: Generate a QueryBuilder
+### ✅ Option 1: Use the built-in `useQuery` (with default config)
 
 ```ts
-import { GenQueryBuilder } from "mongoose-qb";
+import { useQuery } from "mongoose-qb";
 
-const QueryBuilder = GenQueryBuilder({
-  excludesFields: ["searchTerm", "sort", "fields", "page", "limit"],
+export const retrieveAllTour = async (query: Record<string, string>) => {
+  const result = await useQuery<ITour>(Tour.find(), query)
+    .search(["title", "description", "location"])
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+    .resolver();
+
+  return result;
+};
+```
+
+### 🛠️ Option 2: Create a custom-configured query builder
+
+#### Step 1: Generate a QueryBuilder
+
+```ts
+import { genQueryBuilder } from "mongoose-qb";
+
+const QueryBuilder = genQueryBuilder({
   defaultLimit: 10,
   defaultPage: 1,
   defaultSortField: "-createdAt",
 });
 ```
 
-- `excludesFields`: Array of query parameter keys that should be excluded from filtering logic.
-- `defaultLimit`: Default number of documents per page.
-- `defaultPage`: Default page number.
-- `defaultSortField`: Default sorting field (prefix with `-` for descending).
+> 🧠 `mongoose-qb` automatically excludes common control keys like `searchTerm`, `sort`, `fields`, `page`, and `limit` from filtering. You don’t need to configure that manually.
 
-### Step 2: Create a reusable query function
+#### Step 2: Create a reusable query function
 
 ```ts
 import { createUseQuery } from "mongoose-qb";
@@ -59,58 +75,111 @@ import { createUseQuery } from "mongoose-qb";
 export const useQuery = createUseQuery(QueryBuilder);
 ```
 
-### Step 3: Use the query builder in your data fetching function
+#### Step 3: Use it in your service or controller
 
 ```ts
 import { useQuery } from "./your-query-file";
 
 export const retrieveAllTour = async (query: Record<string, string>) => {
-  const tour = await useQuery<ITour>(Tour.find(), query)
-    .search(["title", "description", "location"]) // Search across multiple fields
-    .filter() // Filter based on query parameters (excluding the excluded ones)
-    .sort() // Sort based on query or default
-    .fields() // Select specific fields from the query
-    .paginate() // Apply pagination
-    .resolver(); // Execute and return results
+  const result = await useQuery<ITour>(Tour.find(), query)
+    .search(["title", "description", "location"])
+    .filter()
+    .sort()
+    .fields()
+    .paginate()
+    .resolver();
 
-  return tour; // Returns { meta, data }
+  return result;
 };
 ```
 
-- **Parameters:**
+## 🔧 `genQueryBuilder` Options
 
-  - `Tour.find()`: Mongoose query to start with.
-  - `query`: Query parameters (usually from request query).
+```ts
+genQueryBuilder({
+  defaultLimit?: number;        // Default limit per page (default: 10)
+  defaultPage?: number;         // Default starting page (default: 1)
+  defaultSortField?: string;    // Default sort key (e.g. "-createdAt")
+});
+```
 
-- **Chainable methods:**
+## 🧠 Chainable Methods
 
-  - `.search(fields: string[])`: Performs a text search on the specified fields using the `searchTerm` query parameter.
-  - `.filter()`: Filters documents based on query parameters except those in `excludesFields`.
-  - `.sort()`: Sorts documents based on the `sort` query parameter or uses `defaultSortField`.
-  - `.fields()`: Selects fields based on the `fields` query parameter (comma-separated).
-  - `.paginate()`: Applies pagination using `page` and `limit` query parameters.
-  - `.resolver()`: Executes the built query and returns the results along with meta information such as total count, page info, etc.
+| Method                      | Description                                                   |
+| --------------------------- | ------------------------------------------------------------- |
+| `.search(fields: string[])` | Performs text search using the `searchTerm` query param       |
+| `.filter()`                 | Filters documents based on query keys (ignoring control keys) |
+| `.sort()`                   | Sorts using the `sort` query param or default                 |
+| `.fields()`                 | Selects fields using `fields=title,description`               |
+| `.paginate()`               | Uses `page` and `limit` to paginate                           |
+| `.resolver()`               | Executes and returns `{ meta, data }`                         |
 
-## Return Value
-
-The `.resolver()` method returns a promise resolving to an object:
+## 📦 Return Format
 
 ```ts
 {
   meta: {
-    total: number;       // total matching documents count
-    limit: number;       // documents per page
-    page: number;        // current page number
-    pages: number;       // total number of pages
+    total: number;  // Total matching documents
+    limit: number;  // Documents per page
+    page: number;   // Current page
+    pages: number;  // Total pages
   },
-  data: T[]               // array of documents of type T
+  data: T[]         // Results (typed)
 }
 ```
 
-## Example Query Parameters
+### Example Response
 
-- `searchTerm`: Text to search across specified fields.
-- `sort`: Field(s) to sort by, prefix with `-` for descending (e.g., `sort=-createdAt`).
-- `fields`: Comma-separated fields to include (e.g., `fields=title,description`).
-- `page`: Page number for pagination.
-- `limit`: Number of documents per page.
+```json
+{
+  "meta": {
+    "total": 42,
+    "limit": 10,
+    "page": 2,
+    "pages": 5
+  },
+  "data": [
+    {
+      "_id": "66a12c...",
+      "title": "Explore Sundarbans",
+      "location": "Khulna",
+      "description": "A 3-day adventurous tour into the world's largest mangrove forest."
+    }
+  ]
+}
+```
+
+## 🔍 Supported Query Parameters
+
+- `searchTerm=...`
+- `sort=createdAt` or `sort=-price`
+- `fields=title,location`
+- `page=2`
+- `limit=5`
+
+## 🧑‍💻 TypeScript Support
+
+Built with full TypeScript support.
+
+```ts
+const result = await useQuery<ITour>(Tour.find(), query).resolver();
+result.data[0].title; // ✅ type-safe
+```
+
+## 🤝 Contributing
+
+We welcome contributions!
+
+1. Fork this repo
+2. Create a feature branch
+3. Submit a pull request 🚀
+
+## 📄 License
+
+MIT License © 2025 [DevAbabil](https://github.com/DevAbabil)
+
+## 🧭 Vision
+
+`mongoose-qb` aims to bring a clean, fluent, and highly customizable querying experience for Mongoose developers by reducing API boilerplate and making powerful features easy to use.
+
+> Built with 🖤 by [DevAbabil](https://devababil.com) — designed to be simple, powerful, and lovable.

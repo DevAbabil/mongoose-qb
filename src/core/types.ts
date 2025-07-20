@@ -1,5 +1,11 @@
 import { Query } from "mongoose";
 
+export interface IOptions {
+  defaultLimit: number;
+  defaultPage: number;
+  defaultSortField?: string;
+}
+
 export type QueryBuilderInstance<T> = {
   modelQuery: Query<Array<T>, T>;
   query: Record<string, string>;

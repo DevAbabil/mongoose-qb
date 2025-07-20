@@ -1,16 +1,21 @@
 import { Query } from "mongoose";
-import type { QueryBuilderInstance } from "./type";
+import type { IOptions, QueryBuilderInstance } from "./types";
+import { excludesFields } from "./constants";
 
-interface IOptions {
-  excludesFields: Array<string>;
-  defaultLimit: number;
-  defaultPage: number;
-  defaultSortField: string;
-}
+const genQueryBuilder = (options: IOptions) => {
+  const { defaultLimit, defaultPage, defaultSortField } = options;
 
-export const GenQueryBuilder = (options: IOptions) => {
-  const { defaultLimit, defaultPage, defaultSortField, excludesFields } =
-    options;
+  if (defaultLimit <= 0)
+    throw new Error("[mongoose-qb]: 'defaultLimit' must be greater than 0");
+
+  if (defaultPage <= 0)
+    throw new Error("[mongoose-qb]: 'defaultPage' must be greater than 0");
+
+  if (defaultSortField?.trim() === "")
+    throw new Error(
+      "[mongoose-qb]: 'defaultSortField' must be a contentful string"
+    );
+
   return class<T> {
     constructor(
       public modelQuery: Query<Array<T>, T>,
@@ -75,16 +80,13 @@ export const GenQueryBuilder = (options: IOptions) => {
   };
 };
 
-export const createUseQuery = (
-  QueryBuilder: ReturnType<typeof GenQueryBuilder>
-) => {
+const createUseQuery = (QueryBuilder: ReturnType<typeof genQueryBuilder>) => {
   return function useQuery<T>(
     modelQuery: Query<Array<T>, T>,
     query: Record<string, string>
   ): QueryBuilderInstance<T> {
-    return new QueryBuilder(
-      modelQuery,
-      query
-    ) as unknown as QueryBuilderInstance<T>;
+    return new QueryBuilder(modelQuery, query) as QueryBuilderInstance<T>;
   };
 };
+
+export { genQueryBuilder, createUseQuery };

@@ -1,1 +1,4 @@
-module.exports = require("./QueryBuilder");
+module.exports = {
+  ...require("./core"),
+  ...require("./utils"),
+};

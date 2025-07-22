@@ -1,32 +1,40 @@
-import { Query } from "mongoose";
+import { createQueryBuilder } from ".";
+import { Model } from "mongoose";
 
-export interface IOptions {
+export interface IQBConfig {
   defaultLimit: number;
   defaultPage: number;
   defaultSortField?: string;
 }
 
-export type QueryBuilderInstance<T> = {
-  modelQuery: Query<Array<T>, T>;
-  query: Record<string, string>;
-  filter(): QueryBuilderInstance<T>;
-  search(fields: Array<string>): QueryBuilderInstance<T>;
-  sort(): QueryBuilderInstance<T>;
-  fields(): QueryBuilderInstance<T>;
-  paginate(): QueryBuilderInstance<T>;
-  getMeta(): Promise<{
-    page: number;
-    limit: number;
-    total: number;
-    totalPage: number;
-  }>;
+export interface IQBMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
+
+export interface IUseQueryOptions {
+  search?: Array<string>;
+  filter?: boolean;
+  sort?: boolean;
+  fields?: boolean;
+  paginate?: boolean;
+}
+
+export type TQueryBuilderInstance<T> = {
   resolver(): Promise<{
     data: Array<T>;
-    meta: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPage: number;
-    };
+    meta: IQBMeta;
   }>;
 };
+
+export type TCreateQuery = (
+  config: IQBConfig
+) => <T>(
+  model: Model<T>,
+  query: Record<string, string>,
+  options?: IUseQueryOptions
+) => TQueryBuilderInstance<T>;
+
+export type TUseQuery = ReturnType<TCreateQuery>;

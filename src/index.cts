@@ -1,4 +1,1 @@
-module.exports = {
-  ...require("./core"),
-  ...require("./utils"),
-};
+module.exports = require("./provider");

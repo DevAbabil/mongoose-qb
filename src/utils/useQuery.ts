@@ -1,8 +1,6 @@
-import { genQueryBuilder, createUseQuery } from "../core";
+import { createQuery } from "../core";
 
-export default createUseQuery(
-  genQueryBuilder({
-    defaultLimit: 10,
-    defaultPage: 1,
-  })
-);
+export default createQuery({
+  defaultLimit: 10,
+  defaultPage: 1,
+});

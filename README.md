@@ -1,12 +1,22 @@
-<h1 align='center'>mongoose-qb</h1>
+<h1 align="center">mongoose-qb</h1>
 
-A powerful and extensible query builder for Mongoose that simplifies complex query operations like filtering, searching, sorting, pagination, and field projection — all from HTTP query parameters.
+<p align="center">
+  A powerful and extensible query builder for Mongoose that simplifies complex query operations like filtering, searching, sorting, pagination, field projection, and population — all from HTTP query parameters.
+</p>
 
-[![npm version](https://img.shields.io/npm/v/mongoose-qb.svg)](https://www.npmjs.com/package/mongoose-qb)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/-TypeScript-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+<p align="center">
+  <a href="https://www.npmjs.com/package/mongoose-qb">
+    <img src="https://img.shields.io/npm/v/mongoose-qb.svg" alt="npm version">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+  </a>
+  <a href="https://www.typescriptlang.org/">
+    <img src="https://img.shields.io/badge/-TypeScript-blue?logo=typescript&logoColor=white" alt="TypeScript">
+  </a>
+</p>
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install mongoose-qb
@@ -25,20 +35,22 @@ yarn add mongoose-qb
 - Sorting by any model field
 - Field limiting (projection)
 - Pagination with meta info
+- Population support (including nested paths)
 - TypeScript support
-- Built-in default query handler: `useQuery`
+- Built-in handler: `useQuery`
+- Optional factory: `createQuery`
 
 ## Concept
 
-This library generates flexible Mongoose queries based on your HTTP query parameters.
+This library builds flexible and clean Mongoose queries from HTTP query parameters.
 
-Example:
+#### Example request:
 
 ```
 GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
 ```
 
-## Syntax
+## Supported Query Parameters
 
 1. ### Search
 
@@ -46,7 +58,8 @@ GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
    ?search=beach
    ```
 
-   Searches across specified fields (e.g. `title`, `description`).
+   - Searches across configured fields (e.g., `title`, `description`, etc.)
+   - Requires `search: string[]` in config
 
 2. ### Filter (Exact Match)
 
@@ -54,7 +67,8 @@ GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
    ?title=Beach Holiday&slug=beach-holiday
    ```
 
-   Filters by exact field match. Only enabled if `filter: true`.
+   - Matches documents with exact field values
+   - Enabled via `filter: true`
 
 3. ### Sort
 
@@ -62,15 +76,16 @@ GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
    ?sort=-createdAt,price
    ```
 
-   Prefix field with `-` for descending order.
+   - Prefix with `-` for descending order
+   - Multiple fields supported
 
-4. ### Field Projection
+4. ### Field Limiting
 
    ```http
    ?fields=title,price,createdAt
    ```
 
-   Only include selected fields in the response.
+   - Includes only the selected fields in the result
 
 5. ### Pagination
 
@@ -78,14 +93,40 @@ GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
    ?page=2&limit=20
    ```
 
-## Usage Example
+   - Default values can be customized with `createQuery()`
 
-### With built-in `useQuery`
+6. ### Population
 
-`service/tour.service.ts`
+   Supports flat and nested Mongoose `populate()` paths.
+
+   ```ts
+   populate: [
+     { path: "author", select: "-__v" },
+     { path: "comment", select: "-__v" },
+     { path: "filed.inner", select: "-__v -title" },
+   ];
+   ```
+
+## Usage Examples
+
+`useQuery options:`
+
+```ts
+const options: IUseQueryOptions = {
+  search: ["title", "description", "slug"], // searchable fields for `search` or `searchTerm` query
+  fields: true, //  to enable projection to select specific filed, default false
+  filter: true, // to enable filed filtering, default false
+  sort: true, // to enable sorting, default false
+  paginate: true, // to enable pagination, default false
+  populate: [{ path: "author", select: "-__v" }], // to populate fields
+};
+```
+
+### Basic Example (with built-in `useQuery`)
 
 ```ts
 import { useQuery, IUseQueryOptions } from "mongoose-qb";
+
 import { ITour } from "./tour.interface";
 import { Tour } from "./tour.model";
 
@@ -96,17 +137,18 @@ export const retrieveAllTour = async (query: Record<string, string>) => {
     filter: true,
     sort: true,
     paginate: true,
+    populate: [{ path: "author", select: "-__v" }],
   };
 
-  const query = useQuery<ITour>(Tour, query, options);
+  const qb = useQuery<ITour>(Tour, query, options); // useQuery<T>(model, query, options)
 
-  return await query.resolver(); // returns { meta, data }
+  return await qb.resolver(); // returns { meta, data }
 };
 ```
 
-### With custom _`createQuery`_
+### Custom `createQuery` Factory
 
-`utils/useQuery.ts`
+`utils/useQuery.ts`:
 
 ```ts
 import { createQuery } from "mongoose-qb";
@@ -118,7 +160,7 @@ export const useQuery = createQuery({
 });
 ```
 
-`service/tour.service.ts`
+Usage:
 
 ```ts
 import { useQuery } from "@/utils/useQuery";
@@ -126,7 +168,7 @@ import { ITour } from "./tour.interface";
 import { Tour } from "./tour.model";
 
 export const retrieveAllTour = async (query: Record<string, string>) => {
-  const query = useQuery<ITour>(Tour, query, {
+  const qb = useQuery<ITour>(Tour, query, {
     search: ["title", "description", "slug"],
     fields: true,
     filter: true,
@@ -134,7 +176,7 @@ export const retrieveAllTour = async (query: Record<string, string>) => {
     paginate: true,
   });
 
-  return await query.resolver(); // { meta, data }
+  return await qb.resolver(); // { meta, data }
 };
 ```
 
@@ -148,16 +190,16 @@ export const retrieveAllTour = async (query: Record<string, string>) => {
     limit: number;
     totalPages: number;
   },
-  data: Array<T>
+  data: Array<T>;
 }
 ```
 
-## 📄 License
+## License
 
-MIT License © 2025 [DevAbabil](https://github.com/DevAbabil)
+MIT License © 2025 [DevAbabil](https://devababil.com)
 
-## 🧭 Vision
+## Vision
 
-`mongoose-qb` aims to bring a clean, fluent, and highly customizable querying experience for Mongoose developers by reducing API boilerplate and making powerful features easy to use.
+`mongoose-qb` aims to bring a clean, fluent, and highly customizable querying experience to Mongoose-based applications — by reducing boilerplate and unlocking the full potential of query parameters.
 
-> Built with 🖤 by [DevAbabil](https://devababil.com) — designed to be simple, powerful, and lovable.
+> Built with 🖤 by [DevAbabil](https://github.com/DevAbabil) — designed to be simple, powerful, and lovable.

@@ -32,6 +32,15 @@ const createQueryBuilder = (options: IQBConfig) => {
       this.modelQuery = this.model.find();
     }
 
+    public populate() {
+      if (this.config?.populate?.length) {
+        for (const { path, select } of this.config.populate) {
+          this.modelQuery = this.modelQuery.populate(path, select);
+        }
+      }
+      return this;
+    }
+
     public filter() {
       const filter = { ...this.query };
       for (const filed of excludesFields) {
@@ -96,6 +105,8 @@ const createQueryBuilder = (options: IQBConfig) => {
       const { fields, filter, paginate, search, sort } = this.config || {};
       const page = Number(this.query.page) || defaultPage;
       const limit = Number(this.query.limit) || defaultLimit;
+
+      this.populate();
 
       if (fields) this.fields();
       if (filter) this.filter();

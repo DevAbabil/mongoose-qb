@@ -1,4 +1,3 @@
-import { createQueryBuilder } from ".";
 import { Model } from "mongoose";
 
 export interface IQBConfig {
@@ -20,6 +19,7 @@ export interface IUseQueryOptions {
   sort?: boolean;
   fields?: boolean;
   paginate?: boolean;
+  populate?: Array<{ path: string; select?: string }>;
 }
 
 export type TQueryBuilderInstance<T> = {

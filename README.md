@@ -1,8 +1,12 @@
-# mongoose-qb
+<h1 align='center'>mongoose-qb</h1>
 
-A powerful and flexible query builder for **Mongoose** that simplifies building complex queries with filtering, searching, sorting, field limiting, and pagination.
+A powerful and extensible query builder for Mongoose that simplifies complex query operations like filtering, searching, sorting, pagination, and field projection — all from HTTP query parameters.
 
-## 🚀 Installation
+[![npm version](https://img.shields.io/npm/v/mongoose-qb.svg)](https://www.npmjs.com/package/mongoose-qb)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/-TypeScript-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+## 📦 Installation
 
 ```bash
 npm install mongoose-qb
@@ -14,165 +18,139 @@ or
 yarn add mongoose-qb
 ```
 
-## 🌟 Overview
+## Features
 
-`mongoose-qb` helps you create **reusable query builder hooks/functions** that wrap around Mongoose queries, making it easy to apply common query patterns such as:
+- Full-text search across specified fields
+- Dynamic filtering with exact match
+- Sorting by any model field
+- Field limiting (projection)
+- Pagination with meta info
+- TypeScript support
+- Built-in default query handler: `useQuery`
 
-- 🔍 Searching (across multiple fields)
-- 🎯 Filtering
-- 🔃 Sorting
-- 📦 Field selection
-- 📚 Pagination
+## Concept
 
-## 📘 Core Concepts
+This library generates flexible Mongoose queries based on your HTTP query parameters.
 
-- **`genQueryBuilder(options)`**: Generate a customized query builder instance.
-- **`createUseQuery(QueryBuilder)`**: Create a reusable query function based on your builder.
-- **Chainable API**: Use `.search()`, `.filter()`, `.sort()`, `.fields()`, `.paginate()`.
-- **`.resolver()`**: Executes the query and returns data with metadata.
+Example:
 
-## ⚙️ Usage
+```
+GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
+```
 
-### ✅ Option 1: Use the built-in `useQuery` (with default config)
+## Syntax
+
+1. ### Search
+
+   ```http
+   ?search=beach
+   ```
+
+   Searches across specified fields (e.g. `title`, `description`).
+
+2. ### Filter (Exact Match)
+
+   ```http
+   ?title=Beach Holiday&slug=beach-holiday
+   ```
+
+   Filters by exact field match. Only enabled if `filter: true`.
+
+3. ### Sort
+
+   ```http
+   ?sort=-createdAt,price
+   ```
+
+   Prefix field with `-` for descending order.
+
+4. ### Field Projection
+
+   ```http
+   ?fields=title,price,createdAt
+   ```
+
+   Only include selected fields in the response.
+
+5. ### Pagination
+
+   ```http
+   ?page=2&limit=20
+   ```
+
+## Usage Example
+
+### With built-in `useQuery`
+
+`service/tour.service.ts`
 
 ```ts
-import { useQuery } from "mongoose-qb";
+import { useQuery, IUseQueryOptions } from "mongoose-qb";
+import { ITour } from "./tour.interface";
+import { Tour } from "./tour.model";
 
 export const retrieveAllTour = async (query: Record<string, string>) => {
-  const result = await useQuery<ITour>(Tour.find(), query)
-    .search(["title", "description", "location"])
-    .filter()
-    .sort()
-    .fields()
-    .paginate()
-    .resolver();
+  const options: IUseQueryOptions = {
+    search: ["title", "description", "slug"],
+    fields: true,
+    filter: true,
+    sort: true,
+    paginate: true,
+  };
 
-  return result;
+  const query = useQuery<ITour>(Tour, query, options);
+
+  return await query.resolver(); // returns { meta, data }
 };
 ```
 
-### 🛠️ Option 2: Create a custom-configured query builder
+### With custom _`createQuery`_
 
-#### Step 1: Generate a QueryBuilder
+`utils/useQuery.ts`
 
 ```ts
-import { genQueryBuilder } from "mongoose-qb";
+import { createQuery } from "mongoose-qb";
 
-const QueryBuilder = genQueryBuilder({
-  defaultLimit: 10,
+export const useQuery = createQuery({
+  defaultLimit: 30,
   defaultPage: 1,
   defaultSortField: "-createdAt",
 });
 ```
 
-> 🧠 `mongoose-qb` automatically excludes common control keys like `searchTerm`, `sort`, `fields`, `page`, and `limit` from filtering. You don’t need to configure that manually.
-
-#### Step 2: Create a reusable query function
+`service/tour.service.ts`
 
 ```ts
-import { createUseQuery } from "mongoose-qb";
-
-export const useQuery = createUseQuery(QueryBuilder);
-```
-
-#### Step 3: Use it in your service or controller
-
-```ts
-import { useQuery } from "./your-query-file";
+import { useQuery } from "@/utils/useQuery";
+import { ITour } from "./tour.interface";
+import { Tour } from "./tour.model";
 
 export const retrieveAllTour = async (query: Record<string, string>) => {
-  const result = await useQuery<ITour>(Tour.find(), query)
-    .search(["title", "description", "location"])
-    .filter()
-    .sort()
-    .fields()
-    .paginate()
-    .resolver();
+  const query = useQuery<ITour>(Tour, query, {
+    search: ["title", "description", "slug"],
+    fields: true,
+    filter: true,
+    sort: true,
+    paginate: true,
+  });
 
-  return result;
+  return await query.resolver(); // { meta, data }
 };
 ```
 
-## 🔧 `genQueryBuilder` Options
-
-```ts
-genQueryBuilder({
-  defaultLimit?: number;        // Default limit per page (default: 10)
-  defaultPage?: number;         // Default starting page (default: 1)
-  defaultSortField?: string;    // Default sort key (e.g. "-createdAt")
-});
-```
-
-## 🧠 Chainable Methods
-
-| Method                      | Description                                                   |
-| --------------------------- | ------------------------------------------------------------- |
-| `.search(fields: string[])` | Performs text search using the `searchTerm` query param       |
-| `.filter()`                 | Filters documents based on query keys (ignoring control keys) |
-| `.sort()`                   | Sorts using the `sort` query param or default                 |
-| `.fields()`                 | Selects fields using `fields=title,description`               |
-| `.paginate()`               | Uses `page` and `limit` to paginate                           |
-| `.resolver()`               | Executes and returns `{ meta, data }`                         |
-
-## 📦 Return Format
+## Return Format
 
 ```ts
 {
   meta: {
-    total: number;  // Total matching documents
-    limit: number;  // Documents per page
-    page: number;   // Current page
-    pages: number;  // Total pages
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
   },
-  data: T[]         // Results (typed)
+  data: Array<T>
 }
 ```
-
-### Example Response
-
-```json
-{
-  "meta": {
-    "total": 42,
-    "limit": 10,
-    "page": 2,
-    "pages": 5
-  },
-  "data": [
-    {
-      "_id": "66a12c...",
-      "title": "Explore Sundarbans",
-      "location": "Khulna",
-      "description": "A 3-day adventurous tour into the world's largest mangrove forest."
-    }
-  ]
-}
-```
-
-## 🔍 Supported Query Parameters
-
-- `searchTerm=...`
-- `sort=createdAt` or `sort=-price`
-- `fields=title,location`
-- `page=2`
-- `limit=5`
-
-## 🧑‍💻 TypeScript Support
-
-Built with full TypeScript support.
-
-```ts
-const result = await useQuery<ITour>(Tour.find(), query).resolver();
-result.data[0].title; // ✅ type-safe
-```
-
-## 🤝 Contributing
-
-We welcome contributions!
-
-1. Fork this repo
-2. Create a feature branch
-3. Submit a pull request 🚀
 
 ## 📄 License
 

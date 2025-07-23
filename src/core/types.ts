@@ -13,13 +13,17 @@ export interface IQBMeta {
   totalPage: number;
 }
 
+export interface IQBPopulate {
+  path: string;
+  select?: string;
+}
 export interface IUseQueryOptions {
   search?: Array<string>;
   filter?: boolean;
   sort?: boolean;
   fields?: boolean;
   paginate?: boolean;
-  populate?: Array<{ path: string; select?: string }>;
+  populate?: Array<IQBPopulate>;
 }
 
 export type TQueryBuilderInstance<T> = {

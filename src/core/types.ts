@@ -26,12 +26,10 @@ export interface IUseQueryOptions {
   populate?: Array<IQBPopulate>;
 }
 
-export type TQueryBuilderInstance<T> = {
-  resolver(): Promise<{
-    data: Array<T>;
-    meta: IQBMeta;
-  }>;
-};
+export interface IUseQueryResult<T> {
+  data: Array<T>;
+  meta: IQBMeta;
+}
 
 export type TCreateQuery = (
   config: IQBConfig
@@ -39,6 +37,4 @@ export type TCreateQuery = (
   model: Model<T>,
   query: Record<string, string>,
   options?: IUseQueryOptions
-) => TQueryBuilderInstance<T>;
-
-export type TUseQuery = ReturnType<TCreateQuery>;
+) => Promise<IUseQueryResult<T>>;

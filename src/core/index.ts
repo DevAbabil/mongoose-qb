@@ -1,25 +1,19 @@
 import { Query, Model } from "mongoose";
 import { excludesFields } from "./constants";
-import type {
-  IQBMeta,
-  IQBConfig,
-  IUseQueryOptions,
-  TCreateQuery,
-} from "./types";
+import { QBError } from "./Error";
+import type * as types from "./types";
 
-const createQueryBuilder = (options: IQBConfig) => {
-  const { defaultLimit, defaultPage, defaultSortField } = options;
+const createQueryBuilder = (config: types.IQBConfig) => {
+  const { defaultLimit, defaultPage, defaultSortField } = config;
 
   if (defaultLimit <= 0)
-    throw new Error("[mongoose-qb]: 'defaultLimit' must be greater than 0");
+    throw new QBError("'defaultLimit' must be greater than 0");
 
   if (defaultPage <= 0)
-    throw new Error("[mongoose-qb]: 'defaultPage' must be greater than 0");
+    throw new QBError("'defaultPage' must be greater than 0");
 
   if (defaultSortField?.trim() === "")
-    throw new Error(
-      "[mongoose-qb]: 'defaultSortField' must be a contentful string"
-    );
+    throw new QBError("'defaultSortField' must be a contentful string");
 
   return class<T> {
     public modelQuery: Query<Array<T>, T>;
@@ -27,18 +21,17 @@ const createQueryBuilder = (options: IQBConfig) => {
     constructor(
       public model: Model<T>,
       public readonly query: Record<string, string>,
-      public readonly config?: IUseQueryOptions
+      public readonly options?: types.IUseQueryOptions
     ) {
       this.modelQuery = this.model.find();
     }
 
     public populate() {
-      if (this.config?.populate?.length) {
-        for (const { path, select } of this.config.populate) {
+      if (this.options?.populate?.length) {
+        for (const { path, select } of this.options.populate) {
           this.modelQuery = this.modelQuery.populate(path, select);
         }
       }
-      return this;
     }
 
     public filter() {
@@ -46,9 +39,7 @@ const createQueryBuilder = (options: IQBConfig) => {
       for (const filed of excludesFields) {
         delete filter[filed];
       }
-
       this.modelQuery = this.modelQuery.find(filter);
-      return this;
     }
 
     public search(searchableField: Array<string>) {
@@ -61,34 +52,38 @@ const createQueryBuilder = (options: IQBConfig) => {
           },
         })),
       });
-      return this;
     }
 
     public sort() {
       this.modelQuery = this.modelQuery.sort(
         this.query.sort?.trim() || defaultSortField
       );
-      return this;
     }
 
     public fields() {
       this.modelQuery = this.modelQuery.select(
         this.query.fields?.trim().split(",").join(" ") || ""
       );
-      return this;
     }
 
     public paginate(page: number, limit: number) {
       this.modelQuery = this.modelQuery.skip((page - 1) * limit).limit(limit);
-      return this;
     }
 
     public async getMeta(
       page: number,
       limit: number,
-      options?: IUseQueryOptions
+      options?: types.IUseQueryOptions
     ) {
-      const total = await this.modelQuery.model.countDocuments();
+      const total = await this.modelQuery.model.countDocuments({
+        $or: options?.search?.map((field) => ({
+          [field]: {
+            $regex:
+              this.query.search?.trim() || this.query.searchTerm?.trim() || "",
+            $options: "i",
+          },
+        })),
+      });
       let totalPage = Math.ceil(total / limit);
 
       page = options?.paginate ? page : 1;
@@ -100,9 +95,9 @@ const createQueryBuilder = (options: IQBConfig) => {
 
     public async resolver(): Promise<{
       data: Array<T>;
-      meta: IQBMeta;
+      meta: types.IQBMeta;
     }> {
-      const { fields, filter, paginate, search, sort } = this.config || {};
+      const { fields, filter, paginate, search, sort } = this.options || {};
       const page = Number(this.query.page) || defaultPage;
       const limit = Number(this.query.limit) || defaultLimit;
 
@@ -119,17 +114,18 @@ const createQueryBuilder = (options: IQBConfig) => {
           : this.paginate(defaultPage, defaultLimit);
 
       return {
-        meta: await this.getMeta(page, limit, this.config),
+        meta: await this.getMeta(page, limit, this.options),
         data: await this.modelQuery,
       };
     }
   };
 };
 
-const createQuery: TCreateQuery = (config) => {
+const createQuery: types.TCreateQuery = (config) => {
   const QueryBuilder = createQueryBuilder(config);
-  return (model, query, options) => {
-    return new QueryBuilder(model, query, options);
+  return async (model, query, options) => {
+    const qb = new QueryBuilder(model, query, options);
+    return await qb.resolver();
   };
 };
 

@@ -8,6 +8,8 @@ const sharedConfig: Options = {
   },
   dts: true,
   clean: true,
+  minify: true,
+  sourcemap: true,
 };
 
 export default defineConfig([

@@ -76,21 +76,22 @@ populate: [
 ### Basic Example (with built-in `useQuery`)
 
 ```typescript
-import { useQuery, IUseQueryOptions } from "mongoose-qb";
+import { useQuery } from "mongoose-qb";
 
 export const retrievePosts = async (query: Record<string, string>) => {
-  const options: IUseQueryOptions = {
+  /* 
+     useQuery<T>(model, query, options)
+  */
+  const post = await useQuery<IPost>(Post, query, {
     fields: true,
     filter: true,
     sort: true,
     paginate: true,
     search: ["title", "description", "slug"],
     populate: [{ path: "author", select: "-__v" }],
-  };
+  });
 
-  const qb = useQuery<IPost>(Post, query, options);
-
-  return await qb.resolver(); // returns { meta, data }
+  return post; // returns { meta, data }
 };
 ```
 
@@ -114,7 +115,7 @@ Then use it:
 import { useQuery } from "@/utils/useQuery";
 
 export const retrievePosts = async (query: Record<string, string>) => {
-  const qb = useQuery<IPost>(Post, query, {
+  const post = await useQuery<IPost>(Post, query, {
     search: ["title", "description", "slug"],
     fields: true,
     filter: true,
@@ -122,7 +123,7 @@ export const retrievePosts = async (query: Record<string, string>) => {
     paginate: true,
   });
 
-  return await qb.resolver();
+  return post; // returns { meta, data }
 };
 ```
 
@@ -142,14 +143,14 @@ export const retrievePosts = async (query: Record<string, string>) => {
 
 ## Configuration Options
 
-| Option     | Type                | Description                  |
-| ---------- | ------------------- | ---------------------------- |
-| `search`   | `string[]`          | Fields to search in          |
-| `fields`   | `boolean`           | Enable field projection      |
-| `filter`   | `boolean`           | Enable exact match filtering |
-| `sort`     | `boolean`           | Enable sorting               |
-| `paginate` | `boolean`           | Enable pagination            |
-| `populate` | `PopulateOptions[]` | Population configuration     |
+| Option     | Type                 | Description                  |
+| ---------- | -------------------- | ---------------------------- |
+| `search`   | `Array<string>`      | Fields to search in          |
+| `fields`   | `boolean`            | Enable field projection      |
+| `filter`   | `boolean`            | Enable exact match filtering |
+| `sort`     | `boolean`            | Enable sorting               |
+| `paginate` | `boolean`            | Enable pagination            |
+| `populate` | `Array<IQBPopulate>` | Population configuration     |
 
 ## License
 

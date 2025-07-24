@@ -2,7 +2,7 @@ export {
   IQBConfig,
   IQBMeta,
   IUseQueryOptions,
-  TUseQuery,
+  IUseQueryResult,
   IQBPopulate,
 } from "./core/types";
 export { createQuery } from "./core";

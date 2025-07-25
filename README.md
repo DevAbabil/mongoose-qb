@@ -46,14 +46,14 @@ Build flexible and clean Mongoose queries from HTTP query parameters.
 **Example request:**
 
 ```
-GET /tours?search=sundarban&sort=-price&fields=title,price&page=2&limit=10
+GET /tours?search=sundarban&sort=-createdAt,price&d=title,price&page=2&limit=20
 ```
 
 ## Supported Query Parameters
 
 | Parameter      | Example                  | Description                         |
 | -------------- | ------------------------ | ----------------------------------- |
-| **Search**     | `?search=beach`          | Searches across configured fields   |
+| **Search**     | `?search=sundarban`      | Searches across configured fields   |
 | **Filter**     | `?title=Beach Holiday`   | Exact match filtering               |
 | **Sort**       | `?sort=-createdAt,price` | Sort with `-` prefix for descending |
 | **Fields**     | `?fields=title,price`    | Field projection                    |
@@ -65,9 +65,9 @@ Supports flat and nested Mongoose `populate`.
 
 ```ts
 populate: [
-  { path: "author", select: "-__v" },
+  { path: "author", select: "-__v -password" },
   { path: "comment", select: "-__v" },
-  { path: "filed.inner", select: "-__v -title" },
+  { path: "field.inner", select: "-__v -title" },
 ];
 ```
 

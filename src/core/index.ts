@@ -1,4 +1,4 @@
-import { Query, Model } from "mongoose";
+import { Query, Model, RootFilterQuery } from "mongoose";
 import { excludesFields } from "./constants";
 import { QBError } from "./Error";
 import type * as types from "./types";
@@ -15,6 +15,26 @@ const createQueryBuilder = (config: types.IQBConfig) => {
   if (defaultSortField?.trim() === "")
     throw new QBError("'defaultSortField' must be a contentful string");
 
+  const getSearchQuery = <T>(
+    searchableField?: Array<string>,
+    searchQuery?: string
+  ) => {
+    return searchableField?.length
+      ? ({
+          $or: searchableField.map((field) => ({
+            [field]: {
+              $regex: searchQuery || "",
+              $options: "i",
+            },
+          })),
+        } as RootFilterQuery<T>)
+      : {};
+  };
+
+  const sanitizeQuery = (querySting: string) => {
+    return querySting?.trim().split(",").join(" ") || "";
+  };
+
   return class<T> {
     public modelQuery: Query<Array<T>, T>;
 
@@ -26,48 +46,32 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       this.modelQuery = this.model.find();
     }
 
-    public populate() {
-      if (this.options?.populate?.length) {
-        for (const { path, select } of this.options.populate) {
-          this.modelQuery = this.modelQuery.populate(path, select);
-        }
-      }
-    }
-
-    public filter() {
-      const filter = { ...this.query };
-      for (const filed of excludesFields) {
-        delete filter[filed];
-      }
-      this.modelQuery = this.modelQuery.find(filter);
-    }
-
-    public search(searchableField: Array<string>) {
-      this.modelQuery = this.modelQuery.find({
-        $or: searchableField.map((field) => ({
-          [field]: {
-            $regex:
-              this.query.search?.trim() || this.query.searchTerm?.trim() || "",
-            $options: "i",
-          },
-        })),
-      });
-    }
-
-    public sort() {
-      this.modelQuery = this.modelQuery.sort(
-        this.query.sort?.trim() || defaultSortField
+    public search(searchableField: Array<string>, searchQuery: string) {
+      this.modelQuery = this.modelQuery.find(
+        getSearchQuery<T>(searchableField, searchQuery)
       );
     }
 
-    public fields() {
-      this.modelQuery = this.modelQuery.select(
-        this.query.fields?.trim().split(",").join(" ") || ""
-      );
+    public filter(filterQuery: Record<string, string>) {
+      this.modelQuery = this.modelQuery.find(filterQuery);
+    }
+
+    public sort(sortQuery: string) {
+      this.modelQuery = this.modelQuery.sort(sortQuery);
+    }
+
+    public fields(fieldsQuery: string) {
+      this.modelQuery = this.modelQuery.select(fieldsQuery);
     }
 
     public paginate(page: number, limit: number) {
       this.modelQuery = this.modelQuery.skip((page - 1) * limit).limit(limit);
+    }
+
+    public populate(populateList: Array<types.IQBPopulate>) {
+      for (const { path, select } of populateList) {
+        this.modelQuery = this.modelQuery.populate(path, select);
+      }
     }
 
     public async getMeta(
@@ -75,19 +79,20 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       limit: number,
       options?: types.IUseQueryOptions
     ) {
-      const search = {
-        $or: options?.search?.map((field) => ({
-          [field]: {
-            $regex:
-              this.query.search?.trim() || this.query.searchTerm?.trim() || "",
-            $options: "i",
-          },
-        })),
-      };
-
-      const total = await this.modelQuery.model.countDocuments(
-        options?.search?.length ? search : {}
-      );
+      const total = await this.modelQuery.model.countDocuments({
+        ...getSearchQuery<T>(
+          options?.search,
+          sanitizeQuery(this.query.search) ||
+            sanitizeQuery(this.query.searchTerm)
+        ),
+        ...(() => {
+          const filter = { ...this.query };
+          for (const filed of excludesFields) {
+            delete filter[filed];
+          }
+          return filter;
+        })(),
+      });
 
       let totalPage = Math.ceil(total / limit);
 
@@ -102,27 +107,54 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       data: Array<T>;
       meta: types.IQBMeta;
     }> {
-      const { fields, filter, paginate, search, sort } = this.options || {};
-      const page = Number(this.query.page) || defaultPage;
-      const limit = Number(this.query.limit) || defaultLimit;
+      let options = this.options || {};
+      let page = Number(this.query.page) || defaultPage;
+      let limit = Number(this.query.limit) || defaultLimit;
+      const meta = await this.getMeta(page, limit, this.options);
 
-      this.populate();
-
-      if (fields) this.fields();
-      if (filter) this.filter();
-      if (sort) this.sort();
-      if (search) this.search(search);
-      console.log(search);
-
-      if (paginate !== undefined)
-        paginate
-          ? this.paginate(page, limit)
-          : this.paginate(defaultPage, defaultLimit);
-
-      return {
-        meta: await this.getMeta(page, limit, this.options),
-        data: await this.modelQuery,
+      const query = {
+        search:
+          sanitizeQuery(this.query.search) ||
+          sanitizeQuery(this.query.searchTerm),
+        sort: sanitizeQuery(this.query.sort),
+        fields: sanitizeQuery(this.query.fields),
       };
+
+      if (options.populate?.length) {
+        this.populate(options.populate);
+      }
+
+      if (options.sort && query.sort) {
+        this.sort(query.sort);
+      }
+
+      if (options.fields && query.fields) {
+        this.fields(query.fields);
+      }
+
+      if (options.search?.length && query.search) {
+        this.search(options.search, query.search);
+      }
+
+      if (options.filter) {
+        const filter = { ...this.query };
+        for (const filed of excludesFields) {
+          delete filter[filed];
+        }
+        this.filter(filter);
+      }
+
+      if (options.paginate !== void 0) {
+        if (options.paginate) {
+          this.paginate(page > meta.totalPage ? 1 : page, limit);
+        } else {
+          this.paginate(defaultPage, defaultLimit);
+        }
+      }
+
+      const data = await this.modelQuery;
+
+      return { meta, data };
     }
   };
 };

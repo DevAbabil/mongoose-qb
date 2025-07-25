@@ -1,6 +1,6 @@
 {
   "name": "mongoose-qb",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A lightweight and flexible query builder for Mongoose, enabling easy chaining of search, filter, sort, field selection, and pagination operations.",
   "scripts": {
     "build": "sh scripts/build.sh"

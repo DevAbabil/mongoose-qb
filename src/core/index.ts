@@ -75,7 +75,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       limit: number,
       options?: types.IUseQueryOptions
     ) {
-      const total = await this.modelQuery.model.countDocuments({
+      const search = {
         $or: options?.search?.map((field) => ({
           [field]: {
             $regex:
@@ -83,7 +83,12 @@ const createQueryBuilder = (config: types.IQBConfig) => {
             $options: "i",
           },
         })),
-      });
+      };
+
+      const total = await this.modelQuery.model.countDocuments(
+        options?.search?.length ? search : {}
+      );
+
       let totalPage = Math.ceil(total / limit);
 
       page = options?.paginate ? page : 1;
@@ -107,6 +112,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       if (filter) this.filter();
       if (sort) this.sort();
       if (search) this.search(search);
+      console.log(search);
 
       if (paginate !== undefined)
         paginate

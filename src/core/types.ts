@@ -17,8 +17,8 @@ export interface IQBPopulate {
   path: string;
   select?: string;
 }
-export interface IUseQueryOptions {
-  search?: Array<string>;
+export interface IUseQueryOptions<T> {
+  search?: Array<keyof T>;
   filter?: boolean;
   sort?: boolean;
   fields?: boolean;
@@ -36,5 +36,5 @@ export type TCreateQuery = (
 ) => <T>(
   model: Model<T>,
   query: Record<string, string>,
-  options?: IUseQueryOptions
+  options?: IUseQueryOptions<T>
 ) => Promise<IUseQueryResult<T>>;

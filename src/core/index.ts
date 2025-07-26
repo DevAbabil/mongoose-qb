@@ -41,7 +41,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
     constructor(
       public model: Model<T>,
       public readonly query: Record<string, string>,
-      public readonly options?: types.IUseQueryOptions
+      public readonly options?: types.IUseQueryOptions<T>
     ) {
       this.modelQuery = this.model.find();
     }
@@ -77,13 +77,13 @@ const createQueryBuilder = (config: types.IQBConfig) => {
     public async getMeta(
       page: number,
       limit: number,
-      options?: types.IUseQueryOptions
+      options?: types.IUseQueryOptions<T>
     ) {
       const total = await this.modelQuery.model.countDocuments({
         ...getSearchQuery<T>(
-          options?.search,
+          options?.search as Array<string>,
           sanitizeQuery(this.query.search) ||
-            sanitizeQuery(this.query.searchTerm)
+            sanitizeQuery(this.query.searchTer)
         ),
         ...(() => {
           const filter = { ...this.query };
@@ -133,7 +133,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       }
 
       if (options.search?.length && query.search) {
-        this.search(options.search, query.search);
+        this.search(options.search as Array<string>, query.search);
       }
 
       if (options.filter) {

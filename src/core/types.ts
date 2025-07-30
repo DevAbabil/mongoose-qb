@@ -23,6 +23,7 @@ export interface IUseQueryOptions<T> {
   sort?: boolean;
   fields?: boolean;
   paginate?: boolean;
+  excludes?: Array<keyof T>;
   populate?: Array<IQBPopulate>;
 }
 

@@ -152,7 +152,15 @@ const createQueryBuilder = (config: types.IQBConfig) => {
         }
       }
 
-      const data = await this.modelQuery;
+      const data = (await this.modelQuery.find().lean()).map((user) => {
+        let draft = { ...user } as T;
+        if (options.excludes?.length) {
+          for (const field of options.excludes) {
+            delete draft[field as keyof typeof draft];
+          }
+        }
+        return draft;
+      });
 
       return { meta, data };
     }

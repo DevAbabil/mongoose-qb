@@ -64,11 +64,19 @@ GET /tours?search=sundarban&sort=-createdAt,price&d=title,price&page=2&limit=20
 Supports flat and nested Mongoose `populate`.
 
 ```ts
+// useQuery option
 populate: [
   { path: "author", select: "-__v -password" },
   { path: "comment", select: "-__v" },
   { path: "field.inner", select: "-__v -title" },
 ];
+```
+
+### Exclude sensitive fields:
+
+```ts
+// useQuery option
+excludes: ["password", "_id"];
 ```
 
 ## Usage Examples
@@ -87,6 +95,7 @@ export const retrievePosts = async (query: Record<string, string>) => {
     filter: true,
     sort: true,
     paginate: true,
+    excludes: ["comments", "likes"],
     search: ["title", "description", "slug"],
     populate: [{ path: "author", select: "-__v" }],
   });
@@ -121,6 +130,7 @@ export const retrievePosts = async (query: Record<string, string>) => {
     filter: true,
     sort: true,
     paginate: true,
+    /* ...more options */
   });
 
   return post; // returns { meta, data }
@@ -151,6 +161,7 @@ export const retrievePosts = async (query: Record<string, string>) => {
 | `sort`     | `boolean`            | Enable sorting               |
 | `paginate` | `boolean`            | Enable pagination            |
 | `populate` | `Array<IQBPopulate>` | Population configuration     |
+| `excludes` | `Array<keyof T>`     | Excludes configuration       |
 
 ## License
 

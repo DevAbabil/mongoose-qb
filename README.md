@@ -145,7 +145,7 @@ export const retrievePosts = async (query: Record<string, string>) => {
     total: number;       // Total documents
     page: number;        // Current page
     limit: number;       // Items per page
-    totalPages: number;  // Total pages
+    totalPage: number;  // Total pages
   },
   data: Array<T>;       // Your documents
 }

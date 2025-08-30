@@ -1,4 +1,4 @@
-import { Query, Model, RootFilterQuery } from "mongoose";
+import { Query, Model, RootFilterQuery, isValidObjectId } from "mongoose";
 import { excludesFields } from "./constants";
 import { QBError } from "./Error";
 import type * as types from "./types";
@@ -16,19 +16,18 @@ const createQueryBuilder = (config: types.IQBConfig) => {
     throw new QBError("'defaultSortField' must be a contentful string");
 
   const getSearchQuery = <T>(
-    searchableField?: Array<string>,
+    searchableField?: Array<keyof T & string>,
     searchQuery?: string
-  ) => {
-    return searchableField?.length
-      ? ({
-          $or: searchableField.map((field) => ({
-            [field]: {
-              $regex: searchQuery || "",
-              $options: "i",
-            },
-          })),
-        } as RootFilterQuery<T>)
-      : {};
+  ): RootFilterQuery<T> => {
+    if (!searchableField?.length || !searchQuery) return {};
+
+    return {
+      $or: searchableField.map((field) => {
+        return isValidObjectId(searchQuery)
+          ? ({ [field]: searchQuery } as any)
+          : ({ [field]: { $regex: searchQuery, $options: "i" } } as any);
+      }),
+    };
   };
 
   const sanitizeQuery = (querySting: string) => {
@@ -46,7 +45,10 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       this.modelQuery = this.model.find();
     }
 
-    public search(searchableField: Array<string>, searchQuery: string) {
+    public search(
+      searchableField: Array<keyof T & string>,
+      searchQuery: string
+    ) {
       this.modelQuery = this.modelQuery.find(
         getSearchQuery<T>(searchableField, searchQuery)
       );
@@ -81,7 +83,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
     ) {
       const total = await this.modelQuery.model.countDocuments({
         ...getSearchQuery<T>(
-          options?.search as Array<string>,
+          options?.search as Array<keyof T & string>,
           sanitizeQuery(this.query.search) ||
             sanitizeQuery(this.query.searchTer)
         ),
@@ -133,7 +135,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       }
 
       if (options.search?.length && query.search) {
-        this.search(options.search as Array<string>, query.search);
+        this.search(options.search as Array<keyof T & string>, query.search);
       }
 
       if (options.filter) {

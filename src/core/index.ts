@@ -85,7 +85,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
         ...getSearchQuery<T>(
           options?.search as Array<keyof T & string>,
           sanitizeQuery(this.query.search) ||
-            sanitizeQuery(this.query.searchTer)
+            sanitizeQuery(this.query.searchTerm)
         ),
         ...(() => {
           const filter = { ...this.query };
@@ -148,7 +148,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
 
       if (options.paginate !== void 0) {
         if (options.paginate) {
-          this.paginate(page > meta.totalPage ? 1 : page, limit);
+          this.paginate(page, limit);
         } else {
           this.paginate(defaultPage, defaultLimit);
         }

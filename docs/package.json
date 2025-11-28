@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "build:netlify": "next build && next export",
     "dev": "next dev",
     "lint": "biome lint .",
     "format": "biome format --write .",

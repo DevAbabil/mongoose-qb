@@ -45,7 +45,7 @@
   "bugs": {
     "url": "https://github.com/DevAbabil/mongoose-qb/issues"
   },
-  "homepage": "https://github.com/DevAbabil/mongoose-qb#readme",
+  "homepage": "https://mongoose-qb.netlify.app",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^24.1.0",

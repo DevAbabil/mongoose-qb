@@ -24,8 +24,10 @@ const createQueryBuilder = (config: types.IQBConfig) => {
     return {
       $or: searchableField.map((field) => {
         return isValidObjectId(searchQuery)
-          ? ({ [field]: searchQuery } as any)
-          : ({ [field]: { $regex: searchQuery, $options: "i" } } as any);
+          ? ({ [field]: searchQuery } as RootFilterQuery<T>)
+          : ({
+              [field]: { $regex: searchQuery, $options: "i" },
+            } as RootFilterQuery<T>);
       }),
     };
   };
@@ -96,22 +98,26 @@ const createQueryBuilder = (config: types.IQBConfig) => {
         })(),
       });
 
-      let totalPage = Math.ceil(total / limit);
+      const totalPage = Math.ceil(total / limit);
+      const finalPage = options?.paginate ? page : 1;
+      const finalLimit = options?.paginate ? limit : total;
+      const finalTotalPage = options?.paginate ? totalPage : 1;
 
-      page = options?.paginate ? page : 1;
-      limit = options?.paginate ? limit : total;
-      totalPage = options?.paginate ? totalPage : 1;
-
-      return { page, limit, total, totalPage };
+      return {
+        page: finalPage,
+        limit: finalLimit,
+        total,
+        totalPage: finalTotalPage,
+      };
     }
 
     public async resolver(): Promise<{
       data: Array<T>;
       meta: types.IQBMeta;
     }> {
-      let options = this.options || {};
-      let page = Number(this.query.page) || defaultPage;
-      let limit = Number(this.query.limit) || defaultLimit;
+      const options = this.options || {};
+      const page = Number(this.query.page) || defaultPage;
+      const limit = Number(this.query.limit) || defaultLimit;
       const meta = await this.getMeta(page, limit, this.options);
 
       const query = {
@@ -155,7 +161,7 @@ const createQueryBuilder = (config: types.IQBConfig) => {
       }
 
       const data = (await this.modelQuery.find().lean()).map((user) => {
-        let draft = { ...user } as T;
+        const draft = { ...user } as T;
         if (options.excludes?.length) {
           for (const field of options.excludes) {
             delete draft[field as keyof typeof draft];

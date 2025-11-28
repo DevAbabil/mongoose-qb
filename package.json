@@ -3,7 +3,10 @@
   "version": "2.2.7",
   "description": "A lightweight and flexible query builder for Mongoose, enabling easy chaining of search, filter, sort, field selection, and pagination operations.",
   "scripts": {
-    "build": "sh scripts/build.sh"
+    "build": "sh scripts/build.sh",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "check": "biome check --write ."
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -44,6 +47,7 @@
   },
   "homepage": "https://github.com/DevAbabil/mongoose-qb#readme",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/node": "^24.1.0",
     "rimraf": "^5.0.10",
     "tsup": "^8.3.6",

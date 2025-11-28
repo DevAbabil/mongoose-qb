@@ -1,4 +1,4 @@
-export {
+export type {
   IQBConfig,
   IQBMeta,
   IUseQueryOptions,

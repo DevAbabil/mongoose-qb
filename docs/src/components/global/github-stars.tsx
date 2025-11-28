@@ -36,7 +36,7 @@ const GitHubStars = () => {
 
   return (
     <a
-      href="https://github.com/devababil/mongoose-qb"
+      href="https://github.com/DevAbabil/mongoose-qb/stargazers"
       target="_blank"
       rel="noopener noreferrer"
       className="group flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-sm transition-all hover:border-green-500/50 hover:bg-green-500/10"

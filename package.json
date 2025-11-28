@@ -19,9 +19,7 @@
   },
   "type": "module",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "keywords": [
     "mongoose",
     "query-builder",

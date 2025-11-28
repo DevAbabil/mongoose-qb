@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
-import { Footer, Header } from "@/components";
+import { Footer, Header, PageTransition } from "@/components";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const geistMono = Geist_Mono({
@@ -55,7 +55,9 @@ export const metadata: Metadata = {
     title: "mongoose-qb | Powerful Query Builder for Mongoose",
     description:
       "A powerful and extensible query builder for Mongoose with full TypeScript support. Simplify complex query operations like filtering, searching, sorting, pagination and field projection — all from HTTP query parameters.",
-    images: ["https://api.devababil.com/v1/assets/share/6902cb6b4f7760ba9fccdd18"],
+    images: [
+      "https://api.devababil.com/v1/assets/share/6902cb6b4f7760ba9fccdd18",
+    ],
     creator: "@devababil",
   },
   robots: {
@@ -78,12 +80,16 @@ export default function RootLayout({
 }>): React.ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
-        <div className="min-h-screen bg-background text-foreground">
-          <Header />
-          {children}
-          <Footer />
-        </div>
+      <body
+        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
+      >
+        <PageTransition>
+          <div className="min-h-screen bg-background text-foreground">
+            <Header />
+            {children}
+            <Footer />
+          </div>
+        </PageTransition>
       </body>
     </html>
   );

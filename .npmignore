@@ -1,5 +1,0 @@
-src/
-.gitignore
-tsconfig.json
-tsup.config.ts
-heartbeat.log

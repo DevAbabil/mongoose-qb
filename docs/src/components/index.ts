@@ -4,6 +4,7 @@ export { default as Footer } from "./global/footer";
 export { default as ThemeToggle } from "./global/theme-toggle";
 export { default as CodeBlock } from "./global/code-block";
 export { default as GitHubStars } from "./global/github-stars";
+export { PageTransition } from "./global/page-transition";
 
 // home page components
 export { default as DocHero } from "./home/doc-hero";

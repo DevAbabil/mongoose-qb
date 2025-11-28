@@ -44,7 +44,7 @@ const InstallationSection = () => {
   }
 
   return (
-    <section id="installation" className="scroll-mt-20 py-50">
+    <section id="installation" className="lg:scroll-mt-24 py-22 md:py-50">
       <div className="container-wide">
         <div className="mx-auto max-w-4xl">
           <div className="group relative overflow-hidden rounded-2xl border border-green-500/20 bg-linear-to-br from-green-500/5 via-background to-blue-500/5 p-8 shadow-xl shadow-green-500/10 transition-all hover:shadow-2xl hover:shadow-green-500/20">
@@ -75,17 +75,19 @@ const InstallationSection = () => {
                 </div>
                 <div className="flex justify-center">
                   <div className="flex flex-wrap gap-2">
-                    {(Object.keys(INSTALL_COMMANDS) as PackageManager[]).map((manager) => (
-                      <Button
-                        key={manager}
-                        variant={selected === manager ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleSelect(manager)}
-                        className="capitalize"
-                      >
-                        {manager}
-                      </Button>
-                    ))}
+                    {(Object.keys(INSTALL_COMMANDS) as PackageManager[]).map(
+                      (manager) => (
+                        <Button
+                          key={manager}
+                          variant={selected === manager ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleSelect(manager)}
+                          className="capitalize"
+                        >
+                          {manager}
+                        </Button>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -99,7 +101,9 @@ const InstallationSection = () => {
                   <div className="absolute inset-0 bg-linear-to-r from-green-500/10 via-transparent to-blue-500/10" />
                   <div className="relative flex items-center gap-3 rounded-lg bg-slate-900/90 px-6 py-5 backdrop-blur dark:bg-slate-950/90">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-green-500/20">
-                      <span className="text-xs font-bold text-green-400">$</span>
+                      <span className="text-xs font-bold text-green-400">
+                        $
+                      </span>
                     </div>
                     <code className="flex-1 font-mono text-sm text-green-400">
                       {INSTALL_COMMANDS[selected]}

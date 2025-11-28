@@ -32,11 +32,16 @@ export const metadata: Metadata = {
   authors: [{ name: "DevAbabil", url: "https://devababil.com" }],
   creator: "DevAbabil",
   publisher: "DevAbabil",
-  metadataBase: new URL("https://mongoose-qb.devababil.com"),
+  metadataBase: new URL("https://mongoose-qb.netlify.app"),
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://mongoose-qb.devababil.com",
+    url: "https://mongoose-qb.netlify.app",
     title: "mongoose-qb | Powerful Query Builder for Mongoose",
     description:
       "A powerful and extensible query builder for Mongoose with full TypeScript support. Simplify complex query operations like filtering, searching, sorting, pagination and field projection — all from HTTP query parameters.",

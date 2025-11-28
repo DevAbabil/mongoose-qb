@@ -1,3 +1,5 @@
+import Logo from "./logo";
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -56,27 +58,34 @@ const Footer = () => {
         <div className="grid gap-8 md:grid-cols-4">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-linear-to-br from-green-500 to-green-700">
-                <span className="text-xs font-bold text-white">QB</span>
-              </div>
+              <Logo width={32} height={32} />
               <h3 className="font-semibold">mongoose-qb</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              A powerful and extensible query builder for Mongoose with full TypeScript support.
+              A powerful and extensible query builder for Mongoose with full
+              TypeScript support.
             </p>
           </div>
 
           {/* Dynamic footer sections */}
           {footerSections.map((section) => (
             <div key={section.title} className="space-y-3">
-              <h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
+              <h4 className="text-sm font-semibold text-foreground">
+                {section.title}
+              </h4>
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      target={link.href.startsWith("http") ? "_blank" : undefined}
-                      rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      target={
+                        link.href.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        link.href.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
                       className="text-sm text-muted-foreground hover:text-foreground hover:text-brand-500 transition-colors duration-200"
                     >
                       {link.label}

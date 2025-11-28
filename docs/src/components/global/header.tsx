@@ -6,6 +6,7 @@ import { Menu, X, Github } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import GitHubStars from "./github-stars";
 import ThemeToggle from "./theme-toggle";
+import Logo from "./logo";
 
 interface HeaderProps {
   sticky?: boolean;
@@ -38,13 +39,17 @@ const Header = ({ sticky = true }: HeaderProps) => {
       }`}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-4 md:px-8">
-        <Link href="/" onClick={handleLogoClick} className="flex items-center gap-3 group">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-lg bg-linear-to-br from-green-500 to-green-700 opacity-20 blur-sm group-hover:opacity-30 transition-opacity" />
-            <div className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-green-500 to-green-700 shadow-lg shadow-green-500/20">
-              <span className="text-sm font-bold text-white">QB</span>
-            </div>
-          </div>
+        <Link
+          href="/"
+          onClick={handleLogoClick}
+          className="flex items-center gap-3 group"
+        >
+          <Logo
+            width={40}
+            height={40}
+            priority
+            className="transition-transform group-hover:scale-105"
+          />
           <div className="hidden sm:block">
             <div className="text-lg font-bold tracking-tight group-hover:text-green-600 transition-colors">
               mongoose-qb
@@ -84,13 +89,19 @@ const Header = ({ sticky = true }: HeaderProps) => {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
+          <GitHubStars />
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
             aria-label="Toggle menu"
+            type="button"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
@@ -121,7 +132,6 @@ const Header = ({ sticky = true }: HeaderProps) => {
                 <span>View on GitHub</span>
               </a>
             </div>
-            <GitHubStars />
           </nav>
         </div>
       )}

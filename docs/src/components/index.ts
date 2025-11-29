@@ -1,4 +1,5 @@
 // Global components
+export { default as Analytics } from "./global/Analytics";
 export { default as Header } from "./global/header";
 export { default as Footer } from "./global/footer";
 export { default as ThemeToggle } from "./global/theme-toggle";

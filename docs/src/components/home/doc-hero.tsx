@@ -31,35 +31,40 @@ const DocHero = () => {
             {HERO_DATA.tagline}
           </p>
 
-          <p className="mx-auto max-w-3xl text-lg text-foreground/70">{HERO_DATA.description}</p>
+          <p className="mx-auto max-w-3xl text-lg text-foreground/70">
+            {HERO_DATA.description}
+          </p>
 
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
             <Image
-              src="https://img.shields.io/npm/v/mongoose-qb?style=flat&logo=npm&color=4f46e5"
+              src="https://img.shields.io/npm/v/mongoose-qb?style=flat&logo=npm&color=4f46e5&cacheSeconds=86400"
               alt="npm version"
               width={0}
               height={0}
               className="h-5 w-auto"
               unoptimized
             />
+
             <Image
-              src="https://img.shields.io/npm/dt/mongoose-qb?style=flat&logo=npm&color=4f46e5"
+              src="https://img.shields.io/npm/dt/mongoose-qb?style=flat&logo=npm&color=4f46e5&cacheSeconds=86400"
               alt="npm downloads"
               width={0}
               height={0}
               className="h-5 w-auto"
               unoptimized
             />
+
             <Image
-              src="https://img.shields.io/github/stars/DevAbabil/mongoose-qb?style=flat&logo=github&color=4f46e5"
+              src="https://img.shields.io/github/stars/DevAbabil/mongoose-qb?style=flat&logo=github&color=4f46e5&cacheSeconds=21600"
               alt="GitHub stars"
               width={0}
               height={0}
               className="h-5 w-auto"
               unoptimized
             />
+
             <Image
-              src="https://img.shields.io/github/license/DevAbabil/mongoose-qb?style=flat&color=4f46e5"
+              src="https://img.shields.io/github/license/DevAbabil/mongoose-qb?style=flat&color=4f46e5&cacheSeconds=604800"
               alt="License"
               width={0}
               height={0}

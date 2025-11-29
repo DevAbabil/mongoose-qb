@@ -7,7 +7,7 @@ const Analytics = () => {
     <SiteViews
       projectName="mongoose-qb documantation"
       suppressLogs
-      style={{ position: "absolute", opacity: 0 }}
+      style={{ display: "none" }}
     />
   );
 };

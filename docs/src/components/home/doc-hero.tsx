@@ -55,15 +55,6 @@ const DocHero = () => {
             />
 
             <Image
-              src="https://img.shields.io/github/stars/DevAbabil/mongoose-qb?style=flat&logo=github&color=4f46e5&cacheSeconds=21600"
-              alt="GitHub stars"
-              width={0}
-              height={0}
-              className="h-5 w-auto"
-              unoptimized
-            />
-
-            <Image
               src="https://img.shields.io/github/license/DevAbabil/mongoose-qb?style=flat&color=4f46e5&cacheSeconds=604800"
               alt="License"
               width={0}

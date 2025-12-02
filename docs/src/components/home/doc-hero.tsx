@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { HERO_DATA } from "@/data/hero";
-import { Sparkles, ArrowDown } from "lucide-react";
+import { Sparkles, ArrowDown, Play } from "lucide-react";
 import Image from "next/image";
 
 const DocHero = () => {
@@ -71,6 +71,15 @@ const DocHero = () => {
             >
               Get Started
               <ArrowDown className="h-4 w-4" />
+            </a>
+            <a
+              href="https://devababil.com/share?slug=mongoose-qb-explanation-video"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background/50 px-6 py-3 font-semibold backdrop-blur transition-all hover:bg-muted/50"
+            >
+              <Play className="h-4 w-4" />
+              Watch Video
             </a>
             <a
               href="#features"
